@@ -1,0 +1,52 @@
+{
+  "builders": [
+    {
+      "type": "qemu",
+      "format": "qcow2",
+      "accelerator": "kvm",
+      "headless": false,
+
+      "boot_command": [
+        "<esc><wait><wait><wait><wait>",
+        "auto preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed-debian11.cfg ",
+        "debian-installer=en_US.UTF-8 locale=en_US keymap=us ",
+        "netcfg/get_hostname={{ .Name }} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "passwd/user-fullname={{user `username`}} ",
+        "passwd/user-password={{user `password`}} ",
+        "passwd/user-password-again={{user `password`}} ",
+        "passwd/username={{user `username`}} ",
+        "<enter>"
+      ],
+      "boot_wait": "2s",
+      "shutdown_command": "echo '{{user `password`}}'|sudo -S shutdown -h now",
+
+      "disk_size": "{{ user `disk_size`}}000",
+
+      "http_directory": "http",
+
+      "iso_url": "/home/yariv/Downloads/debian-11.5.0-amd64-netinst.iso",
+      "iso_checksum": "6a6607a05d57b7c62558e9c462fe5c6c04b9cfad2ce160c3e9140aa4617ab73aff7f5f745dfe51bbbe7b33c9b0e219a022ad682d6c327de0e53e40f079abf66a",
+
+      "vm_name": "{{ user `name`}}",
+      "output_directory": "output",
+
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
+      "ssh_timeout": "3600s"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "setup.sh",
+      "execute_command": "chmod +x {{ .Path }}; echo '{{ user `password` }}' | sudo -S sh {{ .Path }}"
+    }
+  ],
+  "variables": {
+    "disk_size": "50",
+    "name": "custom",
+    "username": "user",
+    "password": "changethispassword"
+  }
+}
