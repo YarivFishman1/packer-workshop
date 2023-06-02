@@ -1,30 +1,37 @@
 # Packer workshop
-## Goal
-Learn how to build a custom debian image via packer from a clean debian 11 base image.
 
-**Note:** This workshop builds the image via qemu but it can be build on other platforms like aws, gcp, digital ocean, etc.
+## Goal
+
+Learn how to build custom images via code in packer.
+
+## About Packer
+
+Packer is an IaC(Infrastructure as code) utility from hashicorp which allows us to build custom images
+via code and not manually.
+The advantages using packer are:
+
+- Documentation - Unlike in manual setup where there is no documentation and things can get lost, with packer our code is the documentation!
+- Review - Because it's a code someone can review our code before deploying.
+- Versioning - Just like other code like python we can version packer code and.
+
+## How does Packer works?
+
+Packer is build from two main components:
+    - Builder - The infrastructure on which the image will be built.
+    - Provisioner - Configures the image like installing packages. shell provisioner is one of the most popular provisioners.
+
+The build process is composed of two stages:
+
+1. The builder boots a vm with a given image. At this stage we can inject boot commands to let the vm use a proprietary config mechanism.
+2. After boot is done, packer executes the provisioners. In the shell provisioner case, packer will wait until there is a connection to the vm.
+
+**Note:** This workshop utilizes qemu for building images but it can be build on other infrastructures like aws, gcp, digital ocean, etc.
 
 ## Setup
+
 1. Install packer from [here](https://www.packer.io/downloads).
 2. Install qemu from [here](https://www.qemu.org/download/).
 
 ## Build an image
-```bash
-$ packer build debian11.json
-```
-**Note:** The final image will be under `output/` directory.
 
-## How packer works?(in a nutshell)
-Packer has two key components:
-- Builder - Runs a vm with the base image.
-- Provisioner - Modifies the running machine. The most common provisioner is shell which executes arbitrary commands on the running machine.
-
-**Note:** In our case the builder is qemu and we have the shell provisioner.
-
-Building Steps:
-* Qemu launchs a vm with the image.
-* After boot, the shell provisioner will try to connect via ssh to machine.
-Because I use a clean debian image, I need to do basic configuration and setup a ssh server. To do this I use a preseed configuration file(learn more [here](https://wiki.debian.org/DebianInstaller/Preseed)), which lets me to config things
-like: time, keyboard, accounts and install packages like ssh-server.
-* After the installation the machine will reboot and the shell provisioner will be able to connect the machine, upload our script and execute it.
-* After the script execution, qemu will shutdown the machine and write the new image into disk.
+In each directory there is a README.md which explains how to build the image.
